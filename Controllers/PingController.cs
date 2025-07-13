@@ -1,6 +1,7 @@
 ﻿using JaeZooServer.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace JaeZooServer.Controllers;
@@ -17,18 +18,23 @@ public class PingController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost]
+    [HttpGet]
     public async Task<IActionResult> Ping()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var user = await _db.Users.FindAsync(userId);
+        var sw = Stopwatch.StartNew();
 
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var user = await _db.Users.FindAsync(userId);
         if (user == null)
             return NotFound();
 
         user.LastPing = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
-        return Ok(new { pinged = DateTime.UtcNow });
+        sw.Stop();
+        return Ok(new { ping = sw.ElapsedMilliseconds });
     }
 }
