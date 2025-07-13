@@ -67,7 +67,10 @@ public AuthService(AppDbContext db, IConfiguration config)
 
     private string GenerateJwtToken(User user)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+        var rawKey = _config["Jwt:Key"]!;
+        Console.WriteLine($"[DEBUG] JWT key: {rawKey} (Length: {rawKey.Length})");
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(rawKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
