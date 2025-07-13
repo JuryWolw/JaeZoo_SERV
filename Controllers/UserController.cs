@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using JaeZooServer.DTOs;
 
 namespace JaeZooServer.Controllers;
 
@@ -63,13 +64,15 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetFriends()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var utcNow = DateTime.UtcNow;
 
         var friends = await _db.FriendRequests
             .Where(fr => (fr.SenderId == userId || fr.ReceiverId == userId) && fr.IsAccepted)
-            .Select(fr => new
+            .Select(fr => new UserDto
             {
                 Id = fr.SenderId == userId ? fr.Receiver.Id : fr.Sender.Id,
-                Username = fr.SenderId == userId ? fr.Receiver.Username : fr.Sender.Username
+                Username = fr.SenderId == userId ? fr.Receiver.Username : fr.Sender.Username,
+                IsOnline = (fr.SenderId == userId ? fr.Receiver.LastPing : fr.Sender.LastPing) > utcNow.AddMinutes(-1)
             })
             .ToListAsync();
 
