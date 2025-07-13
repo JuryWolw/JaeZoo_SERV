@@ -164,7 +164,6 @@ C:\Proj\JZOO2\JaeZooServer\bin\Debug\net8.0\runtimes\win-x64\native\e_sqlite3.dl
 C:\Proj\JZOO2\JaeZooServer\bin\Debug\net8.0\runtimes\win-x86\native\e_sqlite3.dll
 C:\Proj\JZOO2\JaeZooServer\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
 C:\Proj\JZOO2\JaeZooServer\bin\Debug\net8.0\BCrypt.Net-Next.dll
-C:\Proj\JZOO2\JaeZooServer\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Proj\JZOO2\JaeZooServer\obj\Debug\net8.0\JaeZooServer.sourcelink.json
 C:\Proj\JZOO2\JaeZooServer\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Proj\JZOO2\JaeZooServer\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
