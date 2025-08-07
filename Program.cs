@@ -1,4 +1,5 @@
 using JaeZooServer.Data;
+using JaeZooServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -33,44 +34,123 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("https://jaezoo-serv.onrender.com/swagger/v1/swagger.json", "JaeZoo API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "JaeZoo API v1");
     c.RoutePrefix = "swagger";
 });
 
-//app.UseHttpsRedirection();
+app.Urls.Add("http://0.0.0.0:80");
 
+// =====================
+// АВТОРИЗАЦИЯ
+// =====================
+
+// Регистрация
 app.MapPost("/api/auth/register", async (AppDbContext db, IPasswordHasher<string> hasher, RegisterRequest req) =>
 {
-    if (await db.Users.AnyAsync(u => u.Login == req.Login))
-        return Results.BadRequest("Login already exists");
+    if (await db.Users.AnyAsync(u =>
+        u.Login == req.Login ||
+        u.Email == req.Email ||
+        u.Nickname == req.Nickname))
+    {
+        return Results.BadRequest("Пользователь с таким логином, email или никнеймом уже существует.");
+    }
 
-    var user = new JaeZooServer.Models.User
+    var user = new User
     {
         Login = req.Login,
         Email = req.Email,
-        PasswordHash = hasher.HashPassword(req.Login, req.Password)
+        Nickname = req.Nickname,
+        PasswordHash = hasher.HashPassword(req.Login, req.Password),
+        Status = "offline",
+        AvatarUrl = "",
+        Bio = ""
     };
 
     db.Users.Add(user);
     await db.SaveChangesAsync();
 
-    return Results.Ok("User registered");
+    return Results.Ok("Пользователь зарегистрирован");
 });
 
+// Вход
 app.MapPost("/api/auth/login", async (AppDbContext db, IPasswordHasher<string> hasher, LoginRequest req) =>
 {
-    var user = await db.Users.FirstOrDefaultAsync(u => u.Login == req.Login);
+    var user = await db.Users.FirstOrDefaultAsync(u =>
+        u.Login == req.Login ||
+        u.Email == req.Login ||
+        u.Nickname == req.Login);
+
     if (user == null)
-        return Results.BadRequest("Invalid login");
+        return Results.BadRequest("Пользователь не найден");
 
     var result = hasher.VerifyHashedPassword(req.Login, user.PasswordHash, req.Password);
     return result == PasswordVerificationResult.Success
-        ? Results.Ok("Login successful")
-        : Results.BadRequest("Invalid password");
+        ? Results.Ok("Вход успешен")
+        : Results.BadRequest("Неверный пароль");
 });
 
-app.Urls.Add("http://0.0.0.0:80");
+// =====================
+// ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+// =====================
+
+// Получить профиль по ID
+app.MapGet("/api/profile/{id:int}", async (AppDbContext db, int id) =>
+{
+    var user = await db.Users.FindAsync(id);
+    if (user == null)
+        return Results.NotFound("Пользователь не найден");
+
+    var profile = new UserProfileDto(
+        Id: user.Id,
+        Login: user.Login,
+        Email: user.Email,
+        Nickname: user.Nickname,
+        Status: user.Status,
+        AvatarUrl: user.AvatarUrl,
+        Bio: user.Bio
+    );
+
+    return Results.Ok(profile);
+});
+
+// Обновить профиль по ID
+app.MapPut("/api/profile/{id:int}", async (AppDbContext db, int id, UpdateProfileDto dto) =>
+{
+    var user = await db.Users.FindAsync(id);
+    if (user == null)
+        return Results.NotFound("Пользователь не найден");
+
+    user.Nickname = dto.Nickname ?? user.Nickname;
+    user.Status = dto.Status ?? user.Status;
+    user.AvatarUrl = dto.AvatarUrl ?? user.AvatarUrl;
+    user.Bio = dto.Bio ?? user.Bio;
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok("Профиль обновлён");
+});
+
 app.Run();
 
-record RegisterRequest(string Login, string Email, string Password);
+// =====================
+// DTO
+// =====================
+record RegisterRequest(string Login, string Email, string Nickname, string Password);
 record LoginRequest(string Login, string Password);
+
+record UserProfileDto(
+    int Id,
+    string Login,
+    string Email,
+    string Nickname,
+    string Status,
+    string AvatarUrl,
+    string Bio
+);
+
+record UpdateProfileDto(
+    string? Nickname,
+    string? Status,
+    string? AvatarUrl,
+    string? Bio
+);

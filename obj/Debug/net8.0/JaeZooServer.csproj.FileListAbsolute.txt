@@ -166,3 +166,4 @@ C:\PROJECT\JAEZOO\JaeZooServer\obj\Debug\net8.0\refint\JaeZooServer.dll
 C:\PROJECT\JAEZOO\JaeZooServer\obj\Debug\net8.0\JaeZooServer.pdb
 C:\PROJECT\JAEZOO\JaeZooServer\obj\Debug\net8.0\JaeZooServer.genruntimeconfig.cache
 C:\PROJECT\JAEZOO\JaeZooServer\obj\Debug\net8.0\ref\JaeZooServer.dll
+C:\PROJECT\JAEZOO\JaeZooServer\obj\Debug\net8.0\JaeZooServer.sourcelink.json
