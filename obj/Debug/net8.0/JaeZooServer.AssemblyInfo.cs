@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JaeZooServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e966212472aea88777dd808bec77c453a053353d")]
 [assembly: System.Reflection.AssemblyProductAttribute("JaeZooServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JaeZooServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
