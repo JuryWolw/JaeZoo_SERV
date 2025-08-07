@@ -31,7 +31,11 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "JaeZoo API v1");
+    c.RoutePrefix = "swagger";
+});
 //app.UseHttpsRedirection();
 
 app.MapPost("/api/auth/register", async (AppDbContext db, IPasswordHasher<string> hasher, RegisterRequest req) =>
