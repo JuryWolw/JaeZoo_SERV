@@ -94,23 +94,21 @@ app.MapPost("/api/auth/login", async (AppDbContext db, IPasswordHasher<string> h
 // =====================
 
 // Получить профиль по ID
-app.MapGet("/api/profile/{id:int}", async (AppDbContext db, int id) =>
+app.MapGet("/api/profile/bylogin/{login}", async (AppDbContext db, string login) =>
 {
-    var user = await db.Users.FindAsync(id);
-    if (user == null)
+    var user = await db.Users.FirstOrDefaultAsync(u =>
+        u.Login == login || u.Email == login || u.Nickname == login);
+
+    if (user is null)
         return Results.NotFound("Пользователь не найден");
 
-    var profile = new UserProfileDto(
-        Id: user.Id,
-        Login: user.Login,
-        Email: user.Email,
-        Nickname: user.Nickname,
-        Status: user.Status,
-        AvatarUrl: user.AvatarUrl,
-        Bio: user.Bio
-    );
-
-    return Results.Ok(profile);
+    return Results.Ok(new
+    {
+        user.Id,
+        user.Login,
+        user.Email,
+        user.Nickname
+    });
 });
 
 // Обновить профиль по ID
