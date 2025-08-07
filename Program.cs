@@ -32,7 +32,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.MapPost("/api/auth/register", async (AppDbContext db, IPasswordHasher<string> hasher, RegisterRequest req) =>
 {
@@ -64,6 +64,7 @@ app.MapPost("/api/auth/login", async (AppDbContext db, IPasswordHasher<string> h
         : Results.BadRequest("Invalid password");
 });
 
+app.Urls.Add("http://0.0.0.0:80");
 app.Run();
 
 record RegisterRequest(string Login, string Email, string Password);
